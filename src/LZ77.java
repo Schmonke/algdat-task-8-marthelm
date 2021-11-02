@@ -123,6 +123,44 @@ public class LZ77 {
         }
     }
 
+    public void deCompress(byte[] bytes, String outPath) throws IOException{
+        outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(outPath)));
+
+        ArrayList<Byte> b = new ArrayList<>();
+        int currentIndex = 0;
+        int i = 0;//current index in input file
+        while (i < bytes.length - 1){
+            byte condition = bytes[i];
+            if(condition >= 0){
+                //condition is number of uncompressed bytes
+                for (int j = 0; j < condition; j++){
+                    b.add(bytes[i+j+1]);
+                }
+                currentIndex += condition;
+                i += condition + 1;//We read 1 + condition number uncompressed bytes
+            }
+            else{
+                int jump = ((condition & 127) << 4) | ((bytes[i+1] >> 4) &  15);
+                int length = (bytes[i+1] & 0x0F) +1; //Length of pointer
+
+                for (int j = 0; j < length; j++){
+                    b.add(b.get(currentIndex - jump + j));
+                }
+                currentIndex += length;
+                i += 2;//We read a pointer (2 bytes)
+            }
+        }
+        for (i = 0; i < currentIndex; i ++){
+            outputStream.write(b.get(i));
+        }
+        outputStream.flush();
+        outputStream.close();
+    }
+
+    /**
+     * Pointer class to point to a position in Array
+     * Defining where and how much to compress
+     */
     private class Pointer {
         /**
          * lenght: the lenght of the text to compress
@@ -157,6 +195,6 @@ public class LZ77 {
         String path = "src\\algdat-task-8-marthelm\\oppgavetekst";
         LZ77 lz77 = new LZ77();
         lz77.compress(path);
-        lz77.decompress(path);
+        lz77.deCompress(b,path);
     }
 }
