@@ -63,7 +63,7 @@ public class LZ77 {
             }
         }
         if (incompressible.length() != 0) {
-            compressedBytes.add((byte) (incompressible.length())); //Writes lenght of a sequence of incompressible bytes
+            compressedBytes.add((byte) (incompressible.length())); //Writes length of a sequence of incompressible bytes
             for (int c = 0; c < incompressible.length(); c++) //And the sequence
                 compressedBytes.add((byte) incompressible.charAt(c));
         }
